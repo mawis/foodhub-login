@@ -1,0 +1,5 @@
+[global.databases]
+postgres_diesel = { url="postgres://matthias:XXXXXXXX@localhost/userauth" }
+
+[debug]
+port = 8004

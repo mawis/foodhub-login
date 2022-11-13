@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xml:lang="de" lang="de" style="min-height: 100%">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>{% block title %}{% endblock title %} - Foodhub München</title>
+</head>
+
+<body style="min-height: 100%">
+{% block content %}
+{% endblock content %}
+</body>
+</html>

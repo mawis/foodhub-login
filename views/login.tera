@@ -1,0 +1,4 @@
+{% extends "base" %}
+{% block title %}Anmeldung Schichtenvertretung{% endblock title %}
+{% block content %}
+{% endblock content %}
