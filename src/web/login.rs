@@ -127,6 +127,7 @@ async fn get_access_token(config: &Config, code: &str) -> Result<String, AuthSer
     info!("Body: {}", body);
     let res = client
         .post(&config.token_endpoint)
+        .header("Content-Type", "application/x-www-form-urlencoded")
         .body(body)
         .send()
         .await?;
