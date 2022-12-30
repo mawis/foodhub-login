@@ -1,0 +1,14 @@
+{% extends "base" %}
+{% block title %}Externer Fehler{% endblock title %}
+{% block content %}
+    <h1>Die Anmeldung war nicht möglich</h1>
+
+    <p>Beim Abruf der Anmeldeinformation vom OAuth 2.0-Server ist ein Fehler aufgetreten:</p>
+
+    <table>
+        <tr><th>Status Code:</th><td>{{ code }}</td></tr>
+        <tr><th>Body:</th><td>{{ body | escape }}</td></tr>
+    </table>
+
+    <p><a href="./">Zum Login</a></p>
+{% endblock content %}

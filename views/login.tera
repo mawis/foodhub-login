@@ -1,4 +1,8 @@
 {% extends "base" %}
 {% block title %}Anmeldung Schichtenvertretung{% endblock title %}
 {% block content %}
+    <form submit="#" method="post" enctype="multipart/form-data">
+        <input class="{{ checkbox_class | default(value="") }}" type="checkbox" name="privacy_policy" value="accepted"/>
+        <input type="submit" value="login"/>
+    </form>
 {% endblock content %}

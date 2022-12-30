@@ -13,13 +13,17 @@ jwt = "0.16.0"
 lazy_static = "1.4.0"
 log = "0.4.17"
 regex = "1.7.0"
+reqwest = { version = "0.11.12", features = [ "cookies", "json", "rustls-tls"], default-features = false }
 rocket_cors = { git = "https://github.com/lawliet89/rocket_cors.git", rev = "54fae0701dffbe5df686465780218644ee3fae5f" }
 rocket-include-tera = "0.5.4"
 serde = "1.0.147"
 serde_derive = "1.0.147"
 tera = "1.17.1"
+url = "2.3.1"
+urlencoding = "2.1.2"
 uuid = { version = "0.8.2", features = [ "serde", "v4" ] }
 rocket = { version = "0.5.0-rc.2", features = [ "json", "uuid" ] }
+thiserror = "1.0.38"
 tokio = { version = "1.21.2", features = [ "macros", "io-util", "rt-multi-thread" ] }
 
 [dependencies.rocket_sync_db_pools]
