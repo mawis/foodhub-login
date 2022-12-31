@@ -1,9 +1,10 @@
+use crate::jwt::generate_jwt;
 use crate::Config;
 use log::{error, info};
 use reqwest::StatusCode;
 use rocket::form::{Form, FromForm};
 use rocket::http::uri::Uri;
-use rocket::http::{Cookie, CookieJar};
+use rocket::http::{Cookie, CookieJar, SameSite};
 use rocket::response::Redirect;
 use rocket::{get, post, uri, State};
 use rocket_include_tera::{tera_response, EtagIfNoneMatch, TeraContextManager, TeraResponse};
@@ -67,16 +68,38 @@ pub async fn get_index_with_code(
             ))
         }
         Ok(token) => {
-            info!("got token: {}", token);
-            let mut context = HashMap::<&str, &str>::new();
+            let jwt = generate_jwt(&config.jwt_key);
+            let auth_cookie = Cookie::build("x_auth_token", jwt.clone())
+                .path("/")
+                .secure(true)
+                .http_only(true)
+                .same_site(SameSite::Lax)
+                .finish();
+            cookies.add(auth_cookie);
+
+            let mut context = HashMap::<&str, String>::new();
+            context.insert("jwt", jwt);
             Err(tera_response!(
                 tera_cm,
                 etag_if_none_match,
-                "login",
+                "loggedin",
                 context
             ))
+            //Ok(Redirect::to("/"))
         }
     }
+}
+
+#[get("/token?<token>")]
+pub async fn get_token(token: String, cookies: &CookieJar<'_>) -> Redirect {
+    let auth_cookie = Cookie::build("x_auth_token", token)
+        .path("/")
+        .secure(true)
+        .http_only(true)
+        .same_site(SameSite::Lax)
+        .finish();
+    cookies.add(auth_cookie);
+    Redirect::to("/")
 }
 
 #[get("/", rank = 1)]

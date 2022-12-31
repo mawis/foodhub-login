@@ -1,0 +1,7 @@
+{% extends "base" %}
+{% block title %}Angemeldet zur Schichtenvertretung{% endblock title %}
+{% block content %}
+    <h1>Logged in!</h1>
+
+    <p><a href="token?token={{ jwt | escape }}">weiter ...</a></p>
+{% endblock content %}

@@ -7,7 +7,9 @@ edition = "2021"
 
 [dependencies]
 chrono = { version = "0.4.23", features = [ "serde" ] }
-jwt = "0.16.0"
+hex = "0.4.3"
+hmac = "0.11.0"
+jwt = "0.15.0"
 lazy_static = "1.4.0"
 log = "0.4.17"
 regex = "1.7.0"
@@ -16,6 +18,7 @@ rocket_cors = { git = "https://github.com/lawliet89/rocket_cors.git", rev = "54f
 rocket-include-tera = "0.5.4"
 serde = "1.0.147"
 serde_derive = "1.0.147"
+sha2 = "0.9.8"
 tera = "1.17.1"
 url = "2.3.1"
 urlencoding = "2.1.2"

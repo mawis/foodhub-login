@@ -5,6 +5,7 @@ use rocket_include_tera::{tera_resources_initialize, TeraResponse};
 use serde_derive::Deserialize;
 use uuid::Uuid;
 
+mod jwt;
 mod web;
 
 #[derive(Deserialize)]
@@ -15,6 +16,7 @@ pub struct Config {
     client_id: String,
     client_secret: String,
     redirect_uri: String,
+    jwt_key: String,
 }
 
 pub fn uuid_convert(ruuid: rocket::serde::uuid::Uuid) -> Uuid {
@@ -30,6 +32,7 @@ fn rocket() -> Rocket<Build> {
                 tera,
                 "base" => "views/base.tera",
                 "login" => "views/login.tera",
+                "loggedin" => "views/loggedin.tera",
                 "autherror" => "views/autherror.tera"
             )
         }))
@@ -38,7 +41,8 @@ fn rocket() -> Rocket<Build> {
             routes![
                 web::login::get_index,
                 web::login::post_index,
-                web::login::get_index_with_code
+                web::login::get_index_with_code,
+                web::login::get_token
             ],
         )
 }
