@@ -42,7 +42,7 @@ fn rocket() -> Rocket<Build> {
                 web::login::get_index,
                 web::login::post_index,
                 web::login::get_index_with_code,
-                web::login::get_token
+                web::login::get_logout
             ],
         )
 }

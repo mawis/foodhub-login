@@ -4,9 +4,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>{% block title %}{% endblock title %} - Foodhub München</title>
-    <style>
-        .invalid-feedback { outline: 2px solid red }
-    </style>
+    <link href="/fhstatic/style.css" rel="stylesheet"/>
 </head>
 
 <body style="min-height: 100%">

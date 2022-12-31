@@ -1,7 +1,17 @@
 {% extends "base" %}
-{% block title %}Angemeldet zur Schichtenvertretung{% endblock title %}
+{% block title %}Angemeldet zur Tauschbörse{% endblock title %}
 {% block content %}
-    <h1>Logged in!</h1>
+    <h1>Tauschbörse für Festschichten</h1>
 
-    <p><a href="token?token={{ jwt | escape }}">weiter ...</a></p>
+    <form submit="#" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="jwt" value="{{ jwt | escape }}"/>
+
+        <p class="{{ privacy_class | default(value="") }}">
+            <input type="checkbox" name="privacy_policy" value="accepted"/>
+            Ich habe die <a
+            href="/fhstatic/InfoMitglied.pdf" target="_blank">
+            Datenschutzerklärung für die
+            Schichtenaustauschplattform</a> gelesen und akzeptiere diese.</p>
+        <input type="submit" value="weiter …"/>
+    </form>
 {% endblock content %}

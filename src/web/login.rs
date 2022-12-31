@@ -13,8 +13,9 @@ use std::collections::HashMap;
 use thiserror::Error;
 
 #[derive(FromForm, Debug)]
-pub struct LoginForm {
+pub struct PrivacyAcceptForm {
     privacy_policy: Option<String>,
+    jwt: String,
 }
 
 #[derive(Deserialize)]
@@ -39,7 +40,7 @@ pub async fn get_index_with_code(
     etag_if_none_match: EtagIfNoneMatch<'_>,
     cookies: &CookieJar<'_>,
     config: &State<Config>,
-) -> Result<Redirect, TeraResponse> {
+) -> TeraResponse {
     info!("Code is {:?}", code);
 
     let token = get_access_token(config, code).await;
@@ -49,23 +50,13 @@ pub async fn get_index_with_code(
             let mut context = HashMap::new();
             context.insert("code", state.as_str().to_string());
             context.insert("body", body);
-            Err(tera_response!(
-                tera_cm,
-                etag_if_none_match,
-                "autherror",
-                context
-            ))
+            tera_response!(tera_cm, etag_if_none_match, "autherror", context)
         }
         Err(AuthServerError::ReqwestError(_)) => {
             let mut context = HashMap::new();
             context.insert("code", String::new());
             context.insert("body", format!("{:?}", token));
-            Err(tera_response!(
-                tera_cm,
-                etag_if_none_match,
-                "autherror",
-                context
-            ))
+            tera_response!(tera_cm, etag_if_none_match, "autherror", context)
         }
         Ok(token) => {
             let jwt = generate_jwt(&config.jwt_key);
@@ -79,43 +70,33 @@ pub async fn get_index_with_code(
 
             let mut context = HashMap::<&str, String>::new();
             context.insert("jwt", jwt);
-            Err(tera_response!(
-                tera_cm,
-                etag_if_none_match,
-                "loggedin",
-                context
-            ))
-            //Ok(Redirect::to("/"))
+            tera_response!(tera_cm, etag_if_none_match, "loggedin", context)
         }
     }
 }
 
-#[get("/token?<token>")]
-pub async fn get_token(token: String, cookies: &CookieJar<'_>) -> Redirect {
-    let auth_cookie = Cookie::build("x_auth_token", token)
+#[get("/logout")]
+pub async fn get_logout(cookies: &CookieJar<'_>) -> Redirect {
+    let auth_cookie = Cookie::build("x_auth_token", "")
         .path("/")
         .secure(true)
         .http_only(true)
         .same_site(SameSite::Lax)
         .finish();
-    cookies.add(auth_cookie);
+    cookies.remove(auth_cookie);
     Redirect::to("/")
 }
 
 #[get("/", rank = 1)]
-pub async fn get_index(
-    tera_cm: &State<TeraContextManager>,
-    etag_if_none_match: EtagIfNoneMatch<'_>,
-) -> TeraResponse {
-    let context = HashMap::<String, String>::new();
-    tera_response!(tera_cm, etag_if_none_match, "login", context)
+pub async fn get_index(config: &State<Config>) -> Redirect {
+    Redirect::to(start_oauth_uri(config))
 }
 
 #[post("/", data = "<form>")]
 pub async fn post_index(
     tera_cm: &State<TeraContextManager>,
     etag_if_none_match: EtagIfNoneMatch<'_>,
-    form: Form<LoginForm>,
+    form: Form<PrivacyAcceptForm>,
     cookies: &CookieJar<'_>,
     config: &State<Config>,
 ) -> Result<Redirect, TeraResponse> {
@@ -126,15 +107,22 @@ pub async fn post_index(
                 .secure(true)
                 .finish();
             cookies.add(policy_accepted_cookie);
-            Ok(Redirect::to(start_oauth_uri(config)))
+            let auth_cookie = Cookie::build("x_auth_token", form.jwt.clone())
+                .path("/")
+                .secure(true)
+                .http_only(true)
+                .finish();
+            cookies.add(auth_cookie);
+            Ok(Redirect::to("/"))
         }
         false => {
-            let mut context = HashMap::<&str, &str>::new();
-            context.insert("checkbox_class", "invalid-feedback");
+            let mut context = HashMap::<&str, String>::new();
+            context.insert("privacy_class", "invalid-feedback".to_string());
+            context.insert("jwt", form.jwt.clone());
             Err(tera_response!(
                 tera_cm,
                 etag_if_none_match,
-                "login",
+                "loggedin",
                 context
             ))
         }
@@ -162,8 +150,6 @@ async fn get_access_token(config: &Config, code: &str) -> Result<String, AuthSer
             body: res.text().await?,
         });
     }
-
-    //let token: TokenResponse = res.json().await?;
 
     Ok(String::from("got token!"))
 }
